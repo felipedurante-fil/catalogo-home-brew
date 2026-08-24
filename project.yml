@@ -1,0 +1,41 @@
+name: BrewCatalog
+options:
+  bundleIdPrefix: com.felipedurante
+  deploymentTarget:
+    macOS: "15.0"
+  createIntermediateGroups: true
+
+targets:
+  BrewCatalog:
+    type: application
+    platform: macOS
+    sources:
+      - path: Sources
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.felipedurante.BrewCatalog
+        # PRODUCT_NAME com acento/espaço: é o que dá nome à pasta "Catálogo Home Brew.app"
+        # que o Finder mostra de verdade (CFBundleDisplayName não muda o nome do ARQUIVO
+        # na listagem do Finder, só em Spotlight/Launchpad/Force Quit). Mas o binário
+        # (Mach-O) por dentro fica em EXECUTABLE_NAME ASCII — sinalizar um binário com
+        # acento no nome quebrava o codesign ("code object is not signed at all").
+        PRODUCT_NAME: "Catálogo Home Brew"
+        EXECUTABLE_NAME: BrewCatalog
+        MARKETING_VERSION: "1.0"
+        CURRENT_PROJECT_VERSION: "1"
+        SWIFT_VERSION: "5.0"
+        ENABLE_HARDENED_RUNTIME: YES
+        CODE_SIGN_STYLE: Automatic
+        MACOSX_DEPLOYMENT_TARGET: "15.0"
+        # Info.plist próprio (em vez de GENERATE_INFOPLIST_FILE) porque o mecanismo
+        # automático do Xcode amarra CFBundleName ao PRODUCT_NAME sempre, ignorando
+        # INFOPLIST_KEY_CFBundleName — só assim dá pra ter binário/pasta .app em ASCII
+        # (necessário pro codesign) e nome exibido ("Catálogo Home Brew") com acento.
+        INFOPLIST_FILE: Sources/App/Info.plist
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ENABLE_PREVIEWS: YES
+    entitlements:
+      path: Sources/App/BrewCatalog.entitlements
+      properties:
+        com.apple.security.app-sandbox: false
+        com.apple.security.network.client: true

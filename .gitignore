@@ -1,0 +1,23 @@
+# Xcode
+build/
+DerivedData/
+*.xcuserstate
+*.xcuserdatad/
+xcuserdata/
+*.xcscmblueprint
+*.moved-aside
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# O projeto Xcode é gerado a partir do project.yml pelo XcodeGen — não versionamos o
+# .xcodeproj em si, só o que o gera. Rode `xcodegen generate` depois de clonar.
+*.xcodeproj/
+
+# macOS
+.DS_Store
+
+# Swift Package Manager (não usado neste projeto, por precaução)
+.build/
+.swiftpm/
