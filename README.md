@@ -30,8 +30,18 @@ desinstalar pacotes direto pela interface — sem precisar abrir o Terminal.
 
 ## Instalação
 
-No momento não há um binário pré-compilado disponível — veja [Build a partir do
-código-fonte](#build-a-partir-do-código-fonte) abaixo.
+Baixe o `.zip` mais recente na [página de Releases](https://github.com/felipedurante-fil/catalogo-home-brew/releases),
+descompacte e arraste **Catálogo Home Brew.app** para a pasta **Aplicativos**.
+
+> Como o app não é assinado com um certificado pago da Apple (nem notarizado), o macOS vai
+> bloquear a primeira abertura. Clique com o botão direito no app → **Abrir** → confirme. Se
+> aparecer "app está danificado", rode no Terminal:
+> ```bash
+> xattr -cr "/Applications/Catálogo Home Brew.app"
+> ```
+
+Prefere compilar você mesmo? Veja [Build a partir do código-fonte](#build-a-partir-do-código-fonte)
+abaixo.
 
 ## Build a partir do código-fonte
 
