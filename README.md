@@ -48,7 +48,7 @@ código-fonte](#build-a-partir-do-código-fonte) abaixo.
 ### Compilando
 
 ```bash
-git clone https://github.com/<seu-usuario>/catalogo-home-brew.git
+git clone https://github.com/felipedurante-fil/catalogo-home-brew.git
 cd catalogo-home-brew
 xcodegen generate
 open "Catálogo Home Brew.xcodeproj"
