@@ -21,8 +21,8 @@ targets:
         # acento no nome quebrava o codesign ("code object is not signed at all").
         PRODUCT_NAME: "Catálogo Home Brew"
         EXECUTABLE_NAME: BrewCatalog
-        MARKETING_VERSION: "1.0"
-        CURRENT_PROJECT_VERSION: "1"
+        MARKETING_VERSION: "1.0.1"
+        CURRENT_PROJECT_VERSION: "2"
         SWIFT_VERSION: "5.0"
         ENABLE_HARDENED_RUNTIME: YES
         CODE_SIGN_STYLE: Automatic
