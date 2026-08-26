@@ -22,13 +22,34 @@ final class SearchTranslator {
             while !pendingRequests.isEmpty {
                 if Task.isCancelled { return }
                 let request = pendingRequests.removeFirst()
+                let text = await Self.translateWithTimeout(text: request.text, session: session)
+                request.continuation.resume(returning: text)
+            }
+        }
+    }
+
+    /// `session.translate(_:)` roda numa Task destacada (prioridade alta, mas fora da
+    /// MainActor) — em teste real, um pedido de tradução ficou ~12s sem devolver nada e a
+    /// interface inteira parou de responder a teclado/cursor durante esse tempo, sinal de
+    /// que a chamada estava prendendo a thread que também cuida da UI. Um timeout de 6s
+    /// garante que, mesmo se o serviço de tradução do sistema travar, a busca não fica
+    /// travada esperando pra sempre — só deixa de mostrar os resultados "ampliados".
+    private static func translateWithTimeout(text: String, session: TranslationSession) async -> String? {
+        await withTaskGroup(of: String?.self) { group in
+            group.addTask(priority: .userInitiated) {
                 do {
-                    let response = try await session.translate(request.text)
-                    request.continuation.resume(returning: response.targetText)
+                    return try await session.translate(text).targetText
                 } catch {
-                    request.continuation.resume(returning: nil)
+                    return nil
                 }
             }
+            group.addTask {
+                try? await Task.sleep(for: .seconds(6))
+                return nil
+            }
+            let result = await group.next() ?? nil
+            group.cancelAll()
+            return result
         }
     }
 

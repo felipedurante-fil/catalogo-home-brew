@@ -44,12 +44,10 @@ final class TranslationQueue {
                     guard !pending.isEmpty else { break }
                     let package = pending.removeFirst()
                     enqueuedIDs.remove(package.id)
-                    do {
-                        let response = try await session.translate(package.desc)
-                        batch.append((package, response.targetText))
-                    } catch {
-                        // Ignora falhas pontuais de tradução — o pacote continua mostrando o texto original.
+                    if let text = await Self.translateWithTimeout(text: package.desc, session: session) {
+                        batch.append((package, text))
                     }
+                    // Se não voltou nada (falha ou timeout), o pacote continua mostrando o texto original.
                 }
                 for (package, text) in batch {
                     package.descPT = text
@@ -60,6 +58,29 @@ final class TranslationQueue {
                 // como crashes esporádicos ao trocar de app durante uma rajada de traduções).
                 try? await Task.sleep(for: .milliseconds(60))
             }
+        }
+    }
+
+    /// `session.translate(_:)` roda numa Task destacada (prioridade alta, fora da MainActor)
+    /// com um timeout de 6s — em teste real, uma chamada de tradução ficou ~12s sem devolver
+    /// nada e a interface inteira parou de responder a teclado/cursor durante esse tempo,
+    /// sinal de que a chamada estava prendendo a thread que também cuida da UI.
+    private static func translateWithTimeout(text: String, session: TranslationSession) async -> String? {
+        await withTaskGroup(of: String?.self) { group in
+            group.addTask(priority: .userInitiated) {
+                do {
+                    return try await session.translate(text).targetText
+                } catch {
+                    return nil
+                }
+            }
+            group.addTask {
+                try? await Task.sleep(for: .seconds(6))
+                return nil
+            }
+            let result = await group.next() ?? nil
+            group.cancelAll()
+            return result
         }
     }
 }
